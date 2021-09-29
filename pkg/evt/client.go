@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/forstmeier/todalytics/pkg/tbl"
+	"github.com/google/uuid"
 )
 
 var _ Eventer = &Client{}
@@ -38,6 +39,7 @@ func (c *Client) Convert(ctx context.Context, data []byte) (*tbl.Row, error) {
 	}
 
 	row := tbl.Row{
+		ID:          uuid.NewString(),
 		ItemID:      event.EventData.ID,
 		Event:       event.EventName,
 		UserID:      event.EventData.UserID,
