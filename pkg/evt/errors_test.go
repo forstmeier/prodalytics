@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func TestErrorConvert(t *testing.T) {
-	err := &ErrorConvert{
+func TestConvertError(t *testing.T) {
+	err := &ConvertError{
 		err:      errors.New("mock convert error"),
 		function: "function",
 	}

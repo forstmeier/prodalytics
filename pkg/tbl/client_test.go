@@ -24,7 +24,7 @@ func TestAppendRow(t *testing.T) {
 		{
 			description:        "error append row",
 			mockAppendRowError: errors.New("mock append row error"),
-			error:              &ErrorAppendRow{},
+			error:              &AppendRowError{},
 		},
 		{
 			description:        "successful append row invocation",
@@ -47,7 +47,7 @@ func TestAppendRow(t *testing.T) {
 
 			if err != nil {
 				switch e := test.error.(type) {
-				case *ErrorAppendRow:
+				case *AppendRowError:
 					if !errors.As(err, &e) {
 						t.Errorf("incorrect error, received: %v, expected: %v", err, e)
 					}

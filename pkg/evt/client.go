@@ -32,7 +32,7 @@ func New(authorizationToken string) *Client {
 func (c *Client) Convert(ctx context.Context, data []byte) (*tbl.Row, error) {
 	event := Event{}
 	if err := json.Unmarshal(data, &event); err != nil {
-		return nil, &ErrorConvert{
+		return nil, &ConvertError{
 			err:      err,
 			function: "json unmarshal",
 		}
@@ -61,7 +61,7 @@ func (c *Client) Convert(ctx context.Context, data []byte) (*tbl.Row, error) {
 		event.EventData.Labels,
 	)
 	if err != nil {
-		return nil, &ErrorConvert{
+		return nil, &ConvertError{
 			err:      err,
 			function: "get extra values",
 		}
@@ -78,7 +78,7 @@ func (c *Client) Convert(ctx context.Context, data []byte) (*tbl.Row, error) {
 		event.EventData.DateCompleted,
 	)
 	if err != nil {
-		return nil, &ErrorConvert{
+		return nil, &ConvertError{
 			err:      err,
 			function: "parse times",
 		}

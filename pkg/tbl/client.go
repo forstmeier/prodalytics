@@ -25,7 +25,7 @@ func New(sheetsClient sheetsClient) *Client {
 // interface method.
 func (c *Client) AppendRow(ctx context.Context, row Row) error {
 	if err := c.helper.appendRow(ctx, row); err != nil {
-		return &ErrorAppendRow{
+		return &AppendRowError{
 			err: err,
 		}
 	}

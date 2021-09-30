@@ -47,7 +47,7 @@ func TestConvert(t *testing.T) {
 			mockGetExtraValuesOutput: nil,
 			mockGetExtraValuesError:  nil,
 			function:                 "json unmarshal",
-			error:                    &ErrorConvert{},
+			error:                    &ConvertError{},
 		},
 		{
 			description:              "error get extra values",
@@ -56,7 +56,7 @@ func TestConvert(t *testing.T) {
 			mockGetExtraValuesError:  errors.New("mock get extra values error"),
 			row:                      nil,
 			function:                 "get extra values",
-			error:                    &ErrorConvert{},
+			error:                    &ConvertError{},
 		},
 		{
 			description:              "error parse date added",
@@ -65,7 +65,7 @@ func TestConvert(t *testing.T) {
 			mockGetExtraValuesError:  nil,
 			row:                      nil,
 			function:                 "parse times",
-			error:                    &ErrorConvert{},
+			error:                    &ConvertError{},
 		},
 		{
 			description: "successful convert invocation",
@@ -115,13 +115,13 @@ func TestConvert(t *testing.T) {
 
 			if err != nil {
 				switch e := test.error.(type) {
-				case *ErrorConvert:
+				case *ConvertError:
 					if !errors.As(err, &e) {
 						t.Errorf("incorrect error, received: %v, expected: %v", err, e)
 					}
 
-					if err.(*ErrorConvert).function != test.function {
-						t.Errorf("incorrect function, received: %s, expected: %s", err.(*ErrorConvert).function, test.function)
+					if err.(*ConvertError).function != test.function {
+						t.Errorf("incorrect function, received: %s, expected: %s", err.(*ConvertError).function, test.function)
 					}
 				default:
 					t.Fatalf("unexpected error type: %v", err)

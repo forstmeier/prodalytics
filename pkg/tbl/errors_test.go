@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func TestErrorAppendRow(t *testing.T) {
-	err := &ErrorAppendRow{
+func TestAppendRowError(t *testing.T) {
+	err := &AppendRowError{
 		err: errors.New("mock append row error"),
 	}
 
