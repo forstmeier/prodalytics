@@ -3,3 +3,6 @@ coverage.out
 
 # config file
 etc/config/config.json
+
+# credentials file
+etc/creds/creds.json

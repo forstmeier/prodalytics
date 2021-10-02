@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	cloud.google.com/go v0.96.0 // indirect
+	github.com/aws/aws-lambda-go v1.27.0
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/uuid v1.3.0
 	golang.org/x/net v0.0.0-20210929193557-e81a3d93ecf6 // indirect
