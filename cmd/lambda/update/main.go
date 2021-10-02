@@ -16,7 +16,7 @@ import (
 )
 
 func main() {
-	evtClient := evt.New(os.Getenv("AUTHORIZATION_TOKEN"))
+	evtClient := evt.New(os.Getenv("API_TOKEN"))
 
 	sheetsClient, err := sheets.NewService(
 		context.Background(),

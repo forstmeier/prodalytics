@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# uploads the pre-ZIPed AWS Lambda code file to S3
+
+ARTIFACT_BUCKET=$( cat etc/config/config.json | jq -r '.aws.s3.artifact_bucket' )
+
+aws s3 mv update.zip s3://$ARTIFACT_BUCKET/

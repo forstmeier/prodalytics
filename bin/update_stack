@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# updates the infrastructure stack in CloudFormation
+
+CONFIG_JSON=$( cat etc/config/config.json | jq )
+
+STACK_NAME=$( jq -r  '.aws.cloudformation.stack_name' <<< "${CONFIG_JSON}" ) 
+ARTIFACT_BUCKET=$( jq -r  '.aws.s3.artifact_bucket' <<< "${CONFIG_JSON}" ) 
+
+API_TOKEN=$( jq -r  '.todoist.api_token' <<< "${CONFIG_JSON}" ) 
+CLIENT_SECRET=$( jq -r  '.todoist.client_secret' <<< "${CONFIG_JSON}" ) 
+
+aws s3 cp cft.yaml s3://$ARTIFACT_BUCKET/cft.yaml
+
+aws cloudformation update-stack \
+	--stack-name $STACK_NAME \
+	--template-url https://s3.amazonaws.com/$ARTIFACT_BUCKET/cft.yaml \
+	--parameters \
+		ParameterKey=APIToken,ParameterValue=$API_TOKEN \
+		ParameterKey=ClientSecret,ParameterValue=$CLIENT_SECRET \
+		ParameterKey=ArtifactBucket,ParameterValue=$ARTIFACT_BUCKET \
+	--capabilities CAPABILITY_NAMED_IAM

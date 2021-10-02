@@ -1,0 +1,136 @@
+Description: Application resources definition
+
+Parameters:
+  APIToken:
+    Type: String
+    Description: Token for authorizing Todoist API requests
+  ClientSecret:
+    Type: String
+    Description: Secret for validating Todoist webhooks
+  ArtifactBucket:
+    Type: String
+    Description: Storage location for all code and application artifacts
+
+Resources:
+
+  updateFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Ref: ArtifactBucket
+        S3Key: update.zip
+      Description: Function providing core application service
+      Environment:
+        Variables:
+          API_TOKEN:
+            Ref: APIToken
+          CLIENT_SECRET:
+            Ref: ClientSecret
+      Handler: update
+      MemorySize: 128
+      Role:
+        Fn::GetAtt:
+          - updateFunctionRole
+          - Arn
+      Runtime: go1.x
+      Timeout: 5
+
+  updateFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Description: Role for core application logic
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+
+  api:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Parameters:
+        endpointConfigurationTypes: REGIONAL
+      Body:
+        swagger: '2.0'
+        info:
+          title:
+            Fn::Sub: ${AWS::StackName} API
+          version: '0.1'
+        schemes:
+          - https
+        paths:
+          /update:
+            post:
+              produces:
+                - application/json
+              responses:
+                '200':
+                  description: Successful update POST request
+                  schema:
+                    type: object
+              x-amazon-apigateway-integration:
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${updateFunction.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: '200'
+                passthroughBehavior: when_no_match
+                contentHandling: CONVERT_TO_TEXT
+                type: AWS_PROXY
+
+  apiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    Properties: 
+      RestApiId:
+        Ref: api
+      StageName: production
+      StageDescription:
+        MetricsEnabled: true
+        LoggingLevel: ERROR
+
+  apiAccount:
+    Type: AWS::ApiGateway::Account
+    Properties: 
+      CloudWatchRoleArn:
+        Fn::GetAtt:
+          - apiAccountRole
+          - Arn
+
+  apiAccountRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action: sts:AssumeRole        
+      Description: Role for allowing API Gateway to write logs to CloudWatch
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+
+  updateFunctionAPIPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Fn::GetAtt:
+          - updateFunction
+          - Arn
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Sub: arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${api}/*
+
+Outputs:
+
+  UpdateFunctionName:
+    Value:
+      Ref: updateFunction

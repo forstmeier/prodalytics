@@ -1,0 +1,20 @@
+#!/bin/bash
+
+/bin/bash ./bin/build_lambdas
+
+cp etc/scripts/start_app .
+
+CONFIG_DOCUMENT=$( jq -n \
+'{
+	"todoist": {
+		"api_token": "REPLACE",
+		"client_secret": "REPLACE"
+	}
+}'
+)
+
+echo $CONFIG_DOCUMENT > config.json
+
+zip release.zip update.zip start_app cft.yaml config.json
+
+rm update.zip start_app config.json

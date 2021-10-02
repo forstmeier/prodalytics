@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# builds AWS Lambda packages and generates ZIP files
+
+GOARCH=amd64 GOOS=linux go build -o update ./cmd/lambda/update
+
+zip update.zip update
+
+rm update

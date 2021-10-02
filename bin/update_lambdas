@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# updates the AWS Lambdas with the pre-uploaded code files in S3
+
+STACK_NAME=$( cat etc/config/config.json | jq -r '.aws.cloudformation.stack_name' )
+
+STACKS_INFO=$(aws cloudformation describe-stacks --stack-name $STACK_NAME)
+
+STACK_OUTPUTS=$( jq -r  '.Stacks[0].Outputs' <<< "${STACKS_INFO}" ) 
+
+UPDATE_FUNCTION_NAME=$( jq -r 'map(select(.OutputKey == "UpdateFunctionName")) | .[0].OutputValue' <<< "${STACK_OUTPUTS}" )
+
+ARTIFACT_BUCKET=$( cat etc/config/config.json | jq -r '.aws.s3.artifact_bucket' )
+
+REGION=$( aws configure get region )
+
+aws lambda update-function-code \
+	--function-name $UPDATE_FUNCTION_NAME \
+	--s3-bucket $ARTIFACT_BUCKET \
+	--s3-key update.zip \
+	--region $REGION
