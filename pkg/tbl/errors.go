@@ -2,7 +2,7 @@ package tbl
 
 import "fmt"
 
-const packageName = "tbl"
+const errorMessage = "package tbl: %s"
 
 // AppendRowError wraps errors returned by helper method
 // calls in the tbl.Tabler.AppendRow method.
@@ -11,5 +11,5 @@ type AppendRowError struct {
 }
 
 func (e *AppendRowError) Error() string {
-	return fmt.Sprintf("[%s] [append row]: %s", packageName, e.err.Error())
+	return fmt.Sprintf(errorMessage, e.err.Error())
 }

@@ -2,6 +2,8 @@ package tbl
 
 import (
 	"context"
+
+	"google.golang.org/api/sheets/v4"
 )
 
 var _ Tabler = &Client{}
@@ -24,7 +26,33 @@ func New(sheetsClient sheetsClient) *Client {
 // AppendRow implements the tbl.Tabler.AppendRow
 // interface method.
 func (c *Client) AppendRow(ctx context.Context, row Row) error {
-	if err := c.helper.appendRow(ctx, row); err != nil {
+	values := &sheets.ValueRange{
+		Values: [][]interface{}{
+			{
+				row.ID,
+				row.ItemID,
+				row.Event,
+				row.UserID,
+				row.UserEmail,
+				row.ProjectID,
+				row.ProjectName,
+				row.Content,
+				row.Description,
+				row.Notes,
+				row.Priority,
+				row.ParentID,
+				row.SectionID,
+				row.SectionName,
+				row.LabelIDs,
+				row.LabelNames,
+				row.Checked,
+				row.DateAdded,
+				row.DateCompleted,
+			},
+		},
+	}
+
+	if err := c.helper.appendRow(ctx, values); err != nil {
 		return &AppendRowError{
 			err: err,
 		}

@@ -11,7 +11,7 @@ func TestAppendRowError(t *testing.T) {
 	}
 
 	recieved := err.Error()
-	expected := "[tbl] [append row]: mock append row error"
+	expected := "package tbl: mock append row error"
 
 	if recieved != expected {
 		t.Errorf("incorrect error message, received: %s, expected: %s", recieved, expected)

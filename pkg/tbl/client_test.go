@@ -4,12 +4,26 @@ import (
 	"context"
 	"errors"
 	"testing"
+
+	"google.golang.org/api/option"
+	"google.golang.org/api/sheets/v4"
 )
 
-func TestNew(t *testing.T) {
-	sheetsClient := &mockSheetsClient{}
+type mockHelper struct {
+	mockAppendRowError error
+}
 
-	client := New(sheetsClient)
+func (m *mockHelper) appendRow(ctx context.Context, values *sheets.ValueRange) error {
+	return m.mockAppendRowError
+}
+
+func TestNew(t *testing.T) {
+	sheetsClient, err := sheets.NewService(context.Background(), option.WithAPIKey("apiKey"))
+	if err != nil {
+		t.Fatalf("error creating test sheets client: %s", err.Error())
+	}
+
+	client := New(sheetsClient.Spreadsheets.Values)
 	if client == nil {
 		t.Error("error creating tbl client")
 	}
@@ -36,10 +50,8 @@ func TestAppendRow(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			client := &Client{
-				helper: &help{
-					sheetsClient: &mockSheetsClient{
-						mockAppendRowError: test.mockAppendRowError,
-					},
+				helper: &mockHelper{
+					mockAppendRowError: test.mockAppendRowError,
 				},
 			}
 
