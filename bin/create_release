@@ -3,10 +3,17 @@
 /bin/bash ./bin/build_lambdas
 
 cp etc/scripts/start_app .
-cp etc/creds/creds.json .
 
 CONFIG_DOCUMENT=$( jq -n \
 '{
+	"aws": {
+		"s3": {
+			"artifact_bucket": "REPLACE"
+		},
+		"dynamodb": {
+			"table_name": "REPLACE"
+		}
+	},
 	"todoist": {
 		"api_token": "REPLACE",
 		"client_secret": "REPLACE"
@@ -16,6 +23,6 @@ CONFIG_DOCUMENT=$( jq -n \
 
 echo $CONFIG_DOCUMENT > config.json
 
-zip release.zip events.zip start_app cft.yaml config.json creds.json
+zip release.zip events.zip start_app cft.yaml config.json
 
-rm events.zip start_app config.json creds.json
+rm events.zip start_app config.json
