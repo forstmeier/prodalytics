@@ -100,10 +100,10 @@ func (c *Client) AppendRow(ctx context.Context, row Row) error {
 	}
 
 	if len(row.LabelIDs) > 0 {
-		labelIDs := make([]*string, len(row.LabelIDs))
-		for i, labelID := range row.LabelIDs {
-			labelIDInt := strconv.Itoa(labelID)
-			labelIDs[i] = &labelIDInt
+		labelIDs := []*string{}
+		for i := range row.LabelIDs {
+			labelIDString := strconv.Itoa(row.LabelIDs[i])
+			labelIDs = append(labelIDs, &labelIDString)
 		}
 		input.Item["label_ids"] = &dynamodb.AttributeValue{
 			NS: labelIDs,
@@ -111,9 +111,9 @@ func (c *Client) AppendRow(ctx context.Context, row Row) error {
 	}
 
 	if len(row.LabelNames) > 0 {
-		labelNames := make([]*string, len(row.LabelNames))
-		for i, labelName := range row.LabelNames {
-			labelNames[i] = &labelName
+		labelNames := []*string{}
+		for i := range row.LabelNames {
+			labelNames = append(labelNames, &row.LabelNames[i])
 		}
 		input.Item["label_names"] = &dynamodb.AttributeValue{
 			SS: labelNames,
