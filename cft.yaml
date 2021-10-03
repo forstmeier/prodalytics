@@ -10,16 +10,19 @@ Parameters:
   ArtifactBucket:
     Type: String
     Description: Storage location for all code and application artifacts
+  SheetID:
+    Type: String
+    Description: ID for the Google Sheet to hold Todoist data
 
 Resources:
 
-  updateFunction:
+  eventsFunction:
     Type: AWS::Lambda::Function
     Properties:
       Code:
         S3Bucket:
           Ref: ArtifactBucket
-        S3Key: update.zip
+        S3Key: events.zip
       Description: Function providing core application service
       Environment:
         Variables:
@@ -27,16 +30,18 @@ Resources:
             Ref: APIToken
           CLIENT_SECRET:
             Ref: ClientSecret
-      Handler: update
+          SHEET_ID:
+            Ref: SheetID
+      Handler: events
       MemorySize: 128
       Role:
         Fn::GetAtt:
-          - updateFunctionRole
+          - eventsFunctionRole
           - Arn
       Runtime: go1.x
       Timeout: 5
 
-  updateFunctionRole:
+  eventsFunctionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -64,19 +69,19 @@ Resources:
         schemes:
           - https
         paths:
-          /update:
+          /events:
             post:
               produces:
                 - application/json
               responses:
                 '200':
-                  description: Successful update POST request
+                  description: Successful events POST request
                   schema:
                     type: object
               x-amazon-apigateway-integration:
                 httpMethod: POST
                 uri:
-                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${updateFunction.Arn}/invocations
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${eventsFunction.Arn}/invocations
                 responses:
                   default:
                     statusCode: '200'
@@ -117,12 +122,12 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
 
-  updateFunctionAPIPermission:
+  eventsFunctionAPIPermission:
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName:
         Fn::GetAtt:
-          - updateFunction
+          - eventsFunction
           - Arn
       Action: lambda:InvokeFunction
       Principal: apigateway.amazonaws.com
@@ -131,6 +136,9 @@ Resources:
 
 Outputs:
 
-  UpdateFunctionName:
+  EventsFunctionName:
     Value:
-      Ref: updateFunction
+      Ref: eventsFunction
+  EventsAPIEndpoint:
+    Value:
+      Fn::Sub: https://${api}.execute-api.${AWS::Region}.amazonaws.com/production/events

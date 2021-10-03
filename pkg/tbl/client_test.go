@@ -23,7 +23,7 @@ func TestNew(t *testing.T) {
 		t.Fatalf("error creating test sheets client: %s", err.Error())
 	}
 
-	client := New(sheetsClient.Spreadsheets.Values)
+	client := New("sheetID", sheetsClient.Spreadsheets.Values)
 	if client == nil {
 		t.Error("error creating tbl client")
 	}

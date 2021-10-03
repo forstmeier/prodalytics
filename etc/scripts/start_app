@@ -28,7 +28,7 @@ ARTIFACT_BUCKET=$( jq -r  '.aws.s3.artifact_bucket' <<< "${CONFIG_JSON}" )
 API_TOKEN=$( jq -r  '.todoist.api_token' <<< "${CONFIG_JSON}" )
 CLIENT_SECRET=$( jq -r  '.todoist.client_secret' <<< "${CONFIG_JSON}" )
 
-aws s3 mv update.zip s3://$ARTIFACT_BUCKET/
+aws s3 mv events.zip s3://$ARTIFACT_BUCKET/
 
 aws cloudformation deploy \
 	--template-file cft.yaml \

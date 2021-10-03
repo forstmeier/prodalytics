@@ -111,7 +111,7 @@ func Test_handler(t *testing.T) {
 			request: events.APIGatewayProxyRequest{
 				Headers: map[string]string{
 					"User-Agent":            "Todoist-Webhooks",
-					"X-Todoist-Hmac-SHA256": base64.StdEncoding.EncodeToString([]byte("incorrect security header")),
+					"x-todoist-hmac-sha256": base64.StdEncoding.EncodeToString([]byte("incorrect security header")),
 				},
 			},
 			row:   tbl.Row{},
@@ -125,7 +125,7 @@ func Test_handler(t *testing.T) {
 			request: events.APIGatewayProxyRequest{
 				Headers: map[string]string{
 					"User-Agent":            "Todoist-Webhooks",
-					"X-Todoist-Hmac-SHA256": base64.StdEncoding.EncodeToString(securityHeaderValue),
+					"x-todoist-hmac-sha256": base64.StdEncoding.EncodeToString(securityHeaderValue),
 				},
 				Body: body,
 			},
@@ -140,7 +140,7 @@ func Test_handler(t *testing.T) {
 			request: events.APIGatewayProxyRequest{
 				Headers: map[string]string{
 					"User-Agent":            "Todoist-Webhooks",
-					"X-Todoist-Hmac-SHA256": base64.StdEncoding.EncodeToString(securityHeaderValue),
+					"x-todoist-hmac-sha256": base64.StdEncoding.EncodeToString(securityHeaderValue),
 				},
 				Body: body,
 			},
@@ -155,7 +155,7 @@ func Test_handler(t *testing.T) {
 			request: events.APIGatewayProxyRequest{
 				Headers: map[string]string{
 					"User-Agent":            "Todoist-Webhooks",
-					"X-Todoist-Hmac-SHA256": base64.StdEncoding.EncodeToString(securityHeaderValue),
+					"x-todoist-hmac-sha256": base64.StdEncoding.EncodeToString(securityHeaderValue),
 				},
 				Body: body,
 			},

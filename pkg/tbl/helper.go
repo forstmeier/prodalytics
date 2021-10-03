@@ -22,7 +22,7 @@ type sheetsClient interface {
 }
 
 func (h *help) appendRow(ctx context.Context, values *sheets.ValueRange) error {
-	_, err := h.sheetsClient.Append(h.sheetID, "A1", values).Do()
+	_, err := h.sheetsClient.Append(h.sheetID, "A1", values).ValueInputOption("RAW").Do()
 	if err != nil {
 		return err
 	}

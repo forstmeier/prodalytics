@@ -3,6 +3,7 @@
 /bin/bash ./bin/build_lambdas
 
 cp etc/scripts/start_app .
+cp etc/creds/creds.json .
 
 CONFIG_DOCUMENT=$( jq -n \
 '{
@@ -15,6 +16,6 @@ CONFIG_DOCUMENT=$( jq -n \
 
 echo $CONFIG_DOCUMENT > config.json
 
-zip release.zip update.zip start_app cft.yaml config.json
+zip release.zip events.zip start_app cft.yaml config.json creds.json
 
-rm update.zip start_app config.json
+rm events.zip start_app config.json creds.json

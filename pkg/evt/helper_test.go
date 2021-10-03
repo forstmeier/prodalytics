@@ -71,17 +71,17 @@ func Test_getExtraValues(t *testing.T) {
 
 					switch dt := data.(type) {
 					case *project:
-						data.(*project).Name = "project_name"
-					case *notes:
-						data.(*notes).Notes = []note{
+						dt.Name = "project_name"
+					case *[]note:
+						*dt = []note{
 							{
 								Content: "note content",
 							},
 						}
 					case *section:
-						data.(*section).Name = "section_name"
+						dt.Name = "section_name"
 					case *label:
-						data.(*label).Name = "label"
+						dt.Name = "label"
 					default:
 						t.Fatalf("incorrect type received in mock function [%v]", dt)
 					}
@@ -90,7 +90,11 @@ func Test_getExtraValues(t *testing.T) {
 				},
 			}
 
-			extraValues, err := h.getExtraValues(context.Background(), 1, 2, 3, []int{4})
+			projectID := 1
+			itemID := 2
+			sectionID := 3
+			labelIDs := []int{4}
+			extraValues, err := h.getExtraValues(context.Background(), projectID, itemID, &sectionID, labelIDs)
 
 			if err != nil {
 				if err.Error() != test.error {

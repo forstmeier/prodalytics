@@ -10,6 +10,8 @@ ARTIFACT_BUCKET=$( jq -r  '.aws.s3.artifact_bucket' <<< "${CONFIG_JSON}" )
 API_TOKEN=$( jq -r  '.todoist.api_token' <<< "${CONFIG_JSON}" )
 CLIENT_SECRET=$( jq -r  '.todoist.client_secret' <<< "${CONFIG_JSON}" )
 
+SHEET_ID=$( jq -r  '.google.sheet.id' <<< "${CONFIG_JSON}" )
+
 aws cloudformation deploy \
 	--template-file cft.yaml \
 	--s3-bucket $ARTIFACT_BUCKET \
@@ -18,5 +20,6 @@ aws cloudformation deploy \
 		APIToken=$API_TOKEN \
 		ClientSecret=$CLIENT_SECRET \
 		ArtifactBucket=$ARTIFACT_BUCKET \
-	--capabilities CAPABILITY_NAMED_IAM \
+		SheetID=$SHEET_ID \
+	--capabilities CAPABILITY_IAM \
 	--no-fail-on-empty-changeset

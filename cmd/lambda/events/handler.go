@@ -34,7 +34,7 @@ func handler(evtClient evt.Eventer, tblClient tbl.Tabler, clientSecret string) f
 			return errIncorrectUserAgentHeaderValue
 		}
 
-		hmacHeader, ok := request.Headers["X-Todoist-Hmac-SHA256"]
+		hmacHeader, ok := request.Headers["x-todoist-hmac-sha256"]
 		if !ok {
 			util.Log("NO_SECURITY_HEADER", fmt.Sprintf("header check: %t", !ok))
 			return errNoSecurityHeader

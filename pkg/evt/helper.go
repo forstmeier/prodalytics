@@ -12,7 +12,7 @@ import (
 var _ helper = &help{}
 
 type helper interface {
-	getExtraValues(ctx context.Context, projectID, sectionID, itemID int, labelIDs []int) (*extraValues, error)
+	getExtraValues(ctx context.Context, projectID, itemID int, sectionID *int, labelIDs []int) (*extraValues, error)
 }
 
 type help struct {
@@ -27,10 +27,6 @@ type project struct {
 
 type note struct {
 	Content string `json:"content"`
-}
-
-type notes struct {
-	Notes []note
 }
 
 type section struct {
@@ -48,7 +44,7 @@ type extraValues struct {
 	labelNames  []string
 }
 
-func (h *help) getExtraValues(ctx context.Context, projectID, sectionID, itemID int, labelIDs []int) (*extraValues, error) {
+func (h *help) getExtraValues(ctx context.Context, projectID, itemID int, sectionID *int, labelIDs []int) (*extraValues, error) {
 	output := &extraValues{}
 
 	projectData := project{}
@@ -57,22 +53,24 @@ func (h *help) getExtraValues(ctx context.Context, projectID, sectionID, itemID 
 	}
 	output.projectName = projectData.Name
 
-	notesData := notes{}
+	notesData := []note{}
 	if err := h.getData(ctx, h.httpClient, fmt.Sprintf("https://api.todoist.com/rest/v1/comments?task_id=%d", itemID), h.authorizationHeader, &notesData); err != nil {
 		return nil, err
 	}
 
-	notesContent := make([]string, len(notesData.Notes))
-	for i, n := range notesData.Notes {
-		notesContent[i] = n.Content
+	notesContent := make([]string, len(notesData))
+	for i, noteData := range notesData {
+		notesContent[i] = noteData.Content
 	}
 	output.notes = notesContent
 
-	sectionData := section{}
-	if err := h.getData(ctx, h.httpClient, fmt.Sprintf("https://api.todoist.com/rest/v1/sections/%d", sectionID), h.authorizationHeader, &sectionData); err != nil {
-		return nil, err
+	if sectionID != nil {
+		sectionData := section{}
+		if err := h.getData(ctx, h.httpClient, fmt.Sprintf("https://api.todoist.com/rest/v1/sections/%d", sectionID), h.authorizationHeader, &sectionData); err != nil {
+			return nil, err
+		}
+		output.sectionName = sectionData.Name
 	}
-	output.sectionName = sectionData.Name
 
 	labelsData := label{}
 	labelNames := make([]string, len(labelIDs))

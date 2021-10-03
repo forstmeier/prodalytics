@@ -2,6 +2,8 @@ package tbl
 
 import (
 	"context"
+	"strconv"
+	"strings"
 
 	"google.golang.org/api/sheets/v4"
 )
@@ -15,9 +17,10 @@ type Client struct {
 }
 
 // New generates a Client pointer instance.
-func New(sheetsClient sheetsClient) *Client {
+func New(sheetID string, sheetsClient sheetsClient) *Client {
 	return &Client{
 		helper: &help{
+			sheetID:      sheetID,
 			sheetsClient: sheetsClient,
 		},
 	}
@@ -26,6 +29,11 @@ func New(sheetsClient sheetsClient) *Client {
 // AppendRow implements the tbl.Tabler.AppendRow
 // interface method.
 func (c *Client) AppendRow(ctx context.Context, row Row) error {
+	labelIDs := ""
+	for _, labelID := range row.LabelIDs {
+		labelIDs += strconv.Itoa(labelID)
+	}
+
 	values := &sheets.ValueRange{
 		Values: [][]interface{}{
 			{
@@ -38,13 +46,13 @@ func (c *Client) AppendRow(ctx context.Context, row Row) error {
 				row.ProjectName,
 				row.Content,
 				row.Description,
-				row.Notes,
+				strings.Join(row.Notes, "\n\n"),
 				row.Priority,
 				row.ParentID,
 				row.SectionID,
 				row.SectionName,
-				row.LabelIDs,
-				row.LabelNames,
+				labelIDs,
+				strings.Join(row.LabelNames, ","),
 				row.Checked,
 				row.DateAdded,
 				row.DateCompleted,

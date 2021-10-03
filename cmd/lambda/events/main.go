@@ -26,7 +26,10 @@ func main() {
 		log.Fatalf("error creating sheets client: %s", err.Error())
 	}
 
-	tblClient := tbl.New(sheetsClient.Spreadsheets.Values)
+	tblClient := tbl.New(
+		os.Getenv("SHEET_ID"),
+		sheetsClient.Spreadsheets.Values,
+	)
 
 	lambda.Start(handler(evtClient, tblClient, os.Getenv("CLIENT_SECRET")))
 }

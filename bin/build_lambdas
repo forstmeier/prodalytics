@@ -2,8 +2,10 @@
 
 # builds AWS Lambda packages and generates ZIP files
 
-GOARCH=amd64 GOOS=linux go build -o update ./cmd/lambda/update
+GOARCH=amd64 GOOS=linux go build -o events ./cmd/lambda/events
 
-zip update.zip update
+cp etc/creds/creds.json .
 
-rm update
+zip events.zip events creds.json
+
+rm events creds.json

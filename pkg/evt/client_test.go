@@ -22,7 +22,7 @@ type mockHelp struct {
 	mockGetExtraValuesError  error
 }
 
-func (m *mockHelp) getExtraValues(ctx context.Context, projectID, sectionID, itemID int, labelIDs []int) (*extraValues, error) {
+func (m *mockHelp) getExtraValues(ctx context.Context, projectID, itemID int, sectionID *int, labelIDs []int) (*extraValues, error) {
 	return m.mockGetExtraValuesOutput, m.mockGetExtraValuesError
 }
 

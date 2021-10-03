@@ -6,8 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/forstmeier/todalytics/pkg/tbl"
 	"github.com/google/uuid"
+
+	"github.com/forstmeier/todalytics/pkg/tbl"
 )
 
 var _ Eventer = &Client{}
@@ -56,8 +57,8 @@ func (c *Client) Convert(ctx context.Context, data []byte) (*tbl.Row, error) {
 	extraValues, err := c.helper.getExtraValues(
 		ctx,
 		event.EventData.ProjectID,
-		*event.EventData.SectionID,
 		event.EventData.ID,
+		event.EventData.SectionID,
 		event.EventData.Labels,
 	)
 	if err != nil {
@@ -85,7 +86,9 @@ func (c *Client) Convert(ctx context.Context, data []byte) (*tbl.Row, error) {
 	}
 
 	row.DateAdded = *dateAdded
-	row.DateCompleted = dateCompleted
+	if !dateCompleted.IsZero() {
+		row.DateCompleted = dateCompleted
+	}
 
 	row.Checked = parseChecked(ctx, event.EventData.Checked)
 

@@ -2,6 +2,6 @@
 
 # removes the infrastructure stack via AWS CloudFormation
 
-STACK_NAME=$( cat etc/config/config.json | jq '.aws.cloudformation.stack_name' )
+STACK_NAME=$( cat etc/config/config.json | jq -r '.aws.cloudformation.stack_name' )
 
 aws cloudformation delete-stack --stack-name $STACK_NAME
