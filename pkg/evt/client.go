@@ -34,8 +34,7 @@ func (c *Client) Convert(ctx context.Context, data []byte) (*tbl.Row, error) {
 	event := Event{}
 	if err := json.Unmarshal(data, &event); err != nil {
 		return nil, &ConvertError{
-			err:      err,
-			function: "json unmarshal",
+			err: err,
 		}
 	}
 
@@ -63,8 +62,7 @@ func (c *Client) Convert(ctx context.Context, data []byte) (*tbl.Row, error) {
 	)
 	if err != nil {
 		return nil, &ConvertError{
-			err:      err,
-			function: "get extra values",
+			err: err,
 		}
 	}
 
@@ -80,8 +78,7 @@ func (c *Client) Convert(ctx context.Context, data []byte) (*tbl.Row, error) {
 	)
 	if err != nil {
 		return nil, &ConvertError{
-			err:      err,
-			function: "parse times",
+			err: err,
 		}
 	}
 

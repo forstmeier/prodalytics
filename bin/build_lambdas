@@ -4,8 +4,6 @@
 
 GOARCH=amd64 GOOS=linux go build -o events ./cmd/lambda/events
 
-cp etc/creds/creds.json .
+zip events.zip events
 
-zip events.zip events creds.json
-
-rm events creds.json
+rm events

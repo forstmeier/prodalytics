@@ -2,15 +2,14 @@ package evt
 
 import "fmt"
 
-const packageName = "evt"
+const errorMessage = "package evt: %s"
 
-// ConvertError wraps errors returned by functions and
-// helper method calls in the evt.Eventer.Convert method.
+// ConvertError wraps errors returned b helper
+// method calls in the evt.Eventer.Convert method.
 type ConvertError struct {
-	err      error
-	function string
+	err error
 }
 
 func (e *ConvertError) Error() string {
-	return fmt.Sprintf("[%s] [%s]: %s", packageName, e.function, e.err.Error())
+	return fmt.Sprintf(errorMessage, e.err.Error())
 }

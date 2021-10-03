@@ -6,13 +6,13 @@ import (
 )
 
 // Tabler defines methods for adding event data to
-// Google Sheets.
+// AWS DynamoDB.
 type Tabler interface {
 	AppendRow(ctx context.Context, row Row) error
 }
 
 // Row represents a new row to append to the target
-// Google Sheet.
+// DynamoDB table.
 type Row struct {
 	ID            string     `json:"id"`
 	ItemID        int        `json:"item_id"`

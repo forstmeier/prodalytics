@@ -3,13 +3,10 @@
 package main
 
 import (
-	"context"
-	"log"
 	"os"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"google.golang.org/api/option"
-	"google.golang.org/api/sheets/v4"
+	"github.com/aws/aws-sdk-go/aws/session"
 
 	"github.com/forstmeier/todalytics/pkg/evt"
 	"github.com/forstmeier/todalytics/pkg/tbl"
@@ -18,17 +15,11 @@ import (
 func main() {
 	evtClient := evt.New(os.Getenv("API_TOKEN"))
 
-	sheetsClient, err := sheets.NewService(
-		context.Background(),
-		option.WithCredentialsFile("creds.json"),
-	)
-	if err != nil {
-		log.Fatalf("error creating sheets client: %s", err.Error())
-	}
+	newSession := session.New()
 
 	tblClient := tbl.New(
-		os.Getenv("SHEET_ID"),
-		sheetsClient.Spreadsheets.Values,
+		newSession,
+		os.Getenv("TABLE_NAME"),
 	)
 
 	lambda.Start(handler(evtClient, tblClient, os.Getenv("CLIENT_SECRET")))

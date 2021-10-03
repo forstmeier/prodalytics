@@ -10,9 +10,9 @@ Parameters:
   ArtifactBucket:
     Type: String
     Description: Storage location for all code and application artifacts
-  SheetID:
+  TableName:
     Type: String
-    Description: ID for the Google Sheet to hold Todoist data
+    Description: Name for the DynamoDB table to hold Todoist data
 
 Resources:
 
@@ -30,8 +30,8 @@ Resources:
             Ref: APIToken
           CLIENT_SECRET:
             Ref: ClientSecret
-          SHEET_ID:
-            Ref: SheetID
+          TABLE_NAME:
+            Ref: TableName
       Handler: events
       MemorySize: 128
       Role:
@@ -54,6 +54,17 @@ Resources:
       Description: Role for core application logic
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+      Policies:
+        - PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - dynamodb:PutItem
+                Effect: Allow
+                Resource:
+                  - Fn::Sub: arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${TableName}
+          PolicyName:
+            Fn::Sub: ${AWS::StackName}-events-function-policy
 
   api:
     Type: AWS::ApiGateway::RestApi

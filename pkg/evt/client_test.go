@@ -119,10 +119,6 @@ func TestConvert(t *testing.T) {
 					if !errors.As(err, &e) {
 						t.Errorf("incorrect error, received: %v, expected: %v", err, e)
 					}
-
-					if err.(*ConvertError).function != test.function {
-						t.Errorf("incorrect function, received: %s, expected: %s", err.(*ConvertError).function, test.function)
-					}
 				default:
 					t.Fatalf("unexpected error type: %v", err)
 				}

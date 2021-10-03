@@ -4,26 +4,22 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
-	"google.golang.org/api/option"
-	"google.golang.org/api/sheets/v4"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
-type mockHelper struct {
-	mockAppendRowError error
+type mockDynamoDBClient struct {
+	mockDynamoDBClientError error
 }
 
-func (m *mockHelper) appendRow(ctx context.Context, values *sheets.ValueRange) error {
-	return m.mockAppendRowError
+func (m *mockDynamoDBClient) PutItem(input *dynamodb.PutItemInput) (*dynamodb.PutItemOutput, error) {
+	return nil, m.mockDynamoDBClientError
 }
 
 func TestNew(t *testing.T) {
-	sheetsClient, err := sheets.NewService(context.Background(), option.WithAPIKey("apiKey"))
-	if err != nil {
-		t.Fatalf("error creating test sheets client: %s", err.Error())
-	}
-
-	client := New("sheetID", sheetsClient.Spreadsheets.Values)
+	client := New(session.New(), "tableName")
 	if client == nil {
 		t.Error("error creating tbl client")
 	}
@@ -31,31 +27,57 @@ func TestNew(t *testing.T) {
 
 func TestAppendRow(t *testing.T) {
 	tests := []struct {
-		description        string
-		mockAppendRowError error
-		error              error
+		description             string
+		mockDynamoDBClientError error
+		error                   error
 	}{
 		{
-			description:        "error append row",
-			mockAppendRowError: errors.New("mock append row error"),
-			error:              &AppendRowError{},
+			description:             "error append row",
+			mockDynamoDBClientError: errors.New("mock put item error"),
+			error:                   &AppendRowError{},
 		},
 		{
-			description:        "successful append row invocation",
-			mockAppendRowError: nil,
-			error:              nil,
+			description:             "successful append row invocation",
+			mockDynamoDBClientError: nil,
+			error:                   nil,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			client := &Client{
-				helper: &mockHelper{
-					mockAppendRowError: test.mockAppendRowError,
+				dynamoDBClient: &mockDynamoDBClient{
+					mockDynamoDBClientError: test.mockDynamoDBClientError,
 				},
 			}
 
-			err := client.AppendRow(context.Background(), Row{})
+			parentID := 4
+			sectionID := 5
+			sectionName := "section name"
+			dateAdded := time.Now()
+			dateCompleted := dateAdded.Add(time.Hour * 1)
+
+			err := client.AppendRow(context.Background(), Row{
+				ID:            "id",
+				ItemID:        1,
+				Event:         "item:added",
+				UserID:        2,
+				UserEmail:     "test@email.com",
+				ProjectID:     3,
+				ProjectName:   "project name",
+				Content:       "task content",
+				Description:   "task description",
+				Notes:         []string{"task note"},
+				Priority:      1,
+				ParentID:      &parentID,
+				SectionID:     &sectionID,
+				SectionName:   &sectionName,
+				LabelIDs:      []int{6},
+				LabelNames:    []string{"label name"},
+				Checked:       true,
+				DateAdded:     dateAdded,
+				DateCompleted: &dateCompleted,
+			})
 
 			if err != nil {
 				switch e := test.error.(type) {

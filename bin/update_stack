@@ -4,13 +4,12 @@
 
 CONFIG_JSON=$( cat etc/config/config.json | jq )
 
-STACK_NAME=$( jq -r  '.aws.cloudformation.stack_name' <<< "${CONFIG_JSON}" ) 
-ARTIFACT_BUCKET=$( jq -r  '.aws.s3.artifact_bucket' <<< "${CONFIG_JSON}" ) 
+STACK_NAME=$( jq -r '.aws.cloudformation.stack_name' <<< "${CONFIG_JSON}" ) 
+ARTIFACT_BUCKET=$( jq -r '.aws.s3.artifact_bucket' <<< "${CONFIG_JSON}" ) 
+TABLE_NAME=$( jq -r '.aws.dynamodb.table_name' <<< "${CONFIG_JSON}" )
 
-API_TOKEN=$( jq -r  '.todoist.api_token' <<< "${CONFIG_JSON}" ) 
-CLIENT_SECRET=$( jq -r  '.todoist.client_secret' <<< "${CONFIG_JSON}" ) 
-
-SHEET_ID=$( jq -r  '.google.sheet.id' <<< "${CONFIG_JSON}" )
+API_TOKEN=$( jq -r '.todoist.api_token' <<< "${CONFIG_JSON}" ) 
+CLIENT_SECRET=$( jq -r '.todoist.client_secret' <<< "${CONFIG_JSON}" ) 
 
 aws s3 cp cft.yaml s3://$ARTIFACT_BUCKET/cft.yaml
 
@@ -21,5 +20,5 @@ aws cloudformation update-stack \
 		ParameterKey=APIToken,ParameterValue=$API_TOKEN \
 		ParameterKey=ClientSecret,ParameterValue=$CLIENT_SECRET \
 		ParameterKey=ArtifactBucket,ParameterValue=$ARTIFACT_BUCKET \
-		ParameterKey=SheetID,ParameterValue=$SHEET_ID \
+		ParameterKey=TableName,ParameterValue=$TABLE_NAME \
 	--capabilities CAPABILITY_NAMED_IAM
