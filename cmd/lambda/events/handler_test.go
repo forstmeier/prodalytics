@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"reflect"
 	"testing"
@@ -76,6 +77,7 @@ func Test_handler(t *testing.T) {
 		mockEVTClientError  error
 		mockTBLClientError  error
 		request             events.APIGatewayProxyRequest
+		responseStatusCode  int
 		row                 tbl.Row
 		error               error
 	}{
@@ -87,8 +89,9 @@ func Test_handler(t *testing.T) {
 			request: events.APIGatewayProxyRequest{
 				Headers: map[string]string{},
 			},
-			row:   tbl.Row{},
-			error: errIncorrectUserAgentHeaderValue,
+			responseStatusCode: http.StatusBadRequest,
+			row:                tbl.Row{},
+			error:              errIncorrectUserAgentHeaderValue,
 		},
 		{
 			description:         "no security header provided",
@@ -100,8 +103,9 @@ func Test_handler(t *testing.T) {
 					"User-Agent": "Todoist-Webhooks",
 				},
 			},
-			row:   tbl.Row{},
-			error: errNoSecurityHeader,
+			responseStatusCode: http.StatusBadRequest,
+			row:                tbl.Row{},
+			error:              errNoSecurityHeader,
 		},
 		{
 			description:         "incorrect security header value",
@@ -114,8 +118,9 @@ func Test_handler(t *testing.T) {
 					"x-todoist-hmac-sha256": base64.StdEncoding.EncodeToString([]byte("incorrect security header")),
 				},
 			},
-			row:   tbl.Row{},
-			error: errIncorrectSecurityHeaderValue,
+			responseStatusCode: http.StatusBadRequest,
+			row:                tbl.Row{},
+			error:              errIncorrectSecurityHeaderValue,
 		},
 		{
 			description:         "error convert event to row",
@@ -129,8 +134,9 @@ func Test_handler(t *testing.T) {
 				},
 				Body: body,
 			},
-			row:   tbl.Row{},
-			error: errConvertEvent,
+			responseStatusCode: http.StatusInternalServerError,
+			row:                tbl.Row{},
+			error:              errConvertEvent,
 		},
 		{
 			description:         "error append row data",
@@ -144,8 +150,9 @@ func Test_handler(t *testing.T) {
 				},
 				Body: body,
 			},
-			row:   tbl.Row{},
-			error: errAppendRowData,
+			responseStatusCode: http.StatusInternalServerError,
+			row:                tbl.Row{},
+			error:              errAppendRowData,
 		},
 		{
 			description:         "successful handler invocation",
@@ -159,8 +166,9 @@ func Test_handler(t *testing.T) {
 				},
 				Body: body,
 			},
-			row:   tbl.Row{},
-			error: nil,
+			responseStatusCode: http.StatusOK,
+			row:                tbl.Row{},
+			error:              nil,
 		},
 	}
 
@@ -177,7 +185,11 @@ func Test_handler(t *testing.T) {
 
 			handlerFunc := handler(evtClient, tblClient, clientSecret)
 
-			err := handlerFunc(context.Background(), test.request)
+			response, err := handlerFunc(context.Background(), test.request)
+
+			if response.StatusCode != test.responseStatusCode {
+				t.Errorf("incorrect response status code, received: %d, expected: %d", response.StatusCode, test.responseStatusCode)
+			}
 
 			if err != test.error {
 				t.Errorf("incorrect error, received: %v, expected: %v", err, test.error)
