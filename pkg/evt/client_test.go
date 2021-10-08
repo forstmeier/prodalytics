@@ -123,7 +123,8 @@ func TestConvert(t *testing.T) {
 					t.Fatalf("unexpected error type: %v", err)
 				}
 			} else {
-				test.row.ID = row.ID // quick solution to pass the deep equal check
+				test.row.ID = row.ID               // quick solution to pass the deep equal check
+				test.row.Timestamp = row.Timestamp // quick solution to pass the deep equal check
 				if !reflect.DeepEqual(row, test.row) {
 					t.Errorf("incorrect row, \nreceived: %+v,\nexpected: %+v", row, test.row)
 				}

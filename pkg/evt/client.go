@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -40,6 +41,7 @@ func (c *Client) Convert(ctx context.Context, data []byte) (*tbl.Row, error) {
 
 	row := tbl.Row{
 		ID:          uuid.NewString(),
+		Timestamp:   time.Now(),
 		ItemID:      event.EventData.ID,
 		Event:       event.EventName,
 		UserID:      event.EventData.UserID,

@@ -41,6 +41,9 @@ func (c *Client) AppendRow(ctx context.Context, row Row) error {
 			"id": {
 				S: aws.String(row.ID),
 			},
+			"timestamp": {
+				S: aws.String(row.Timestamp.String()),
+			},
 			"item_id": {
 				N: aws.String(strconv.Itoa(row.ItemID)),
 			},

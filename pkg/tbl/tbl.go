@@ -15,6 +15,7 @@ type Tabler interface {
 // DynamoDB table.
 type Row struct {
 	ID            string     `json:"id"`
+	Timestamp     time.Time  `json:"timestamp"`
 	ItemID        int        `json:"item_id"`
 	Event         string     `json:"event"`
 	UserID        int        `json:"user_id"`
